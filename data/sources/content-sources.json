@@ -1,0 +1,42 @@
+[
+  {
+    "source_name": "Tatoeba Japanese Sentences",
+    "source_url": "https://tatoeba.org",
+    "license": "CC BY 2.0 FR",
+    "retrieved_at": "2026-04-18T00:00:00.000Z",
+    "content_type": "reading",
+    "notes": "Open sentence corpus used for short graded passages and listening transcripts."
+  },
+  {
+    "source_name": "JMDict",
+    "source_url": "https://www.edrdg.org/jmdict/j_jmdict.html",
+    "license": "EDRDG Licence",
+    "retrieved_at": "2026-04-18T00:00:00.000Z",
+    "content_type": "vocabulary",
+    "notes": "Dictionary terms used for vocabulary normalization and reading mappings."
+  },
+  {
+    "source_name": "KANJIDIC2",
+    "source_url": "https://www.edrdg.org/kanjidic/kanjd2index.html",
+    "license": "EDRDG Licence",
+    "retrieved_at": "2026-04-18T00:00:00.000Z",
+    "content_type": "kanji",
+    "notes": "Kanji metadata (readings/meanings) for JLPT-oriented cards."
+  },
+  {
+    "source_name": "Wikimedia Commons Japanese Audio",
+    "source_url": "https://commons.wikimedia.org",
+    "license": "CC BY-SA 4.0 (asset dependent)",
+    "retrieved_at": "2026-04-18T00:00:00.000Z",
+    "content_type": "listening",
+    "notes": "Only license-compatible links should be stored; transcript text is normalized in-platform."
+  },
+  {
+    "source_name": "Project-authored Grammar and Kana",
+    "source_url": "https://github.com/imnothoan/Japanese-N1",
+    "license": "CC BY 4.0 / CC0",
+    "retrieved_at": "2026-04-18T00:00:00.000Z",
+    "content_type": "grammar",
+    "notes": "Curated grammar explanations and kana base authored for this project."
+  }
+]

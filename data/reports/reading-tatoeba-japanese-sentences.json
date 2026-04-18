@@ -1,0 +1,14 @@
+{
+  "sourceName": "Tatoeba Japanese Sentences",
+  "sourcePath": "/home/runner/work/Japanese-N1/Japanese-N1/data/raw/reading.json",
+  "contentType": "reading",
+  "totalRecords": 3,
+  "acceptedRecords": 3,
+  "missingRequired": 0,
+  "duplicateCollisions": 0,
+  "byLevel": {
+    "N3": 1,
+    "N2": 1,
+    "N1": 1
+  }
+}

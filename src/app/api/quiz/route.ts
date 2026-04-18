@@ -1,19 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { createServiceSupabase } from "@/lib/supabase";
 import { getRequestUser } from "@/lib/server-auth";
-import { classifyErrorType } from "@/lib/error-classifier";
-
-const schema = z.object({
-  userId: z.string().uuid(),
-  quizTemplateId: z.string().uuid().nullable().optional(),
-  module: z.string().min(1),
-  jlptLevel: z.string().min(2),
-  score: z.number().int(),
-  total: z.number().int().positive(),
-  responses: z.array(z.object({ question: z.string(), chosen: z.string(), correct: z.string() })),
-});
+import { classifyErrorType, getTargetedRetrySet } from "@/lib/error-classifier";
+import { quizSubmissionSchema } from "@/lib/validators";
 
 export async function POST(request: NextRequest) {
   const user = await getRequestUser(request);
@@ -25,10 +15,12 @@ export async function POST(request: NextRequest) {
   });
   if (!limited.allowed) return NextResponse.json({ error: "Rate limit" }, { status: 429 });
 
-  const parsed = schema.safeParse(await request.json());
+  const parsed = quizSubmissionSchema.safeParse(await request.json());
   if (!parsed.success || parsed.data.userId !== user.id) return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
 
   const supabase = createServiceSupabase();
+  const { data: profile } = await supabase.from("profiles").select("kana_mastered").eq("id", user.id).maybeSingle();
+  if (!profile?.kana_mastered) return NextResponse.json({ error: "Kana gate required" }, { status: 403 });
   const { error } = await supabase.from("quiz_attempts").insert({
     user_id: user.id,
     quiz_template_id: parsed.data.quizTemplateId ?? null,
@@ -62,5 +54,6 @@ export async function POST(request: NextRequest) {
     payload: { score: parsed.data.score, total: parsed.data.total },
   });
 
-  return NextResponse.json({ ok: true, mistakes: mistakes.length });
+  const targetedRetry = getTargetedRetrySet(mistakes);
+  return NextResponse.json({ ok: true, mistakes: mistakes.length, targetedRetry });
 }

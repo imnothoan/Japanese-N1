@@ -1,0 +1,10 @@
+{
+  "sourceName": "Project-authored Kana Set",
+  "sourcePath": "/home/runner/work/Japanese-N1/Japanese-N1/data/raw/kana.json",
+  "contentType": "kana",
+  "totalRecords": 4,
+  "acceptedRecords": 4,
+  "missingRequired": 0,
+  "duplicateCollisions": 0,
+  "byLevel": {}
+}

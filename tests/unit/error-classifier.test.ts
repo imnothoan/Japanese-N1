@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classifyErrorType } from "@/lib/error-classifier";
+import { classifyErrorType, getTargetedRetrySet } from "@/lib/error-classifier";
 
 describe("classifyErrorType", () => {
   it("classifies particle errors", () => {
@@ -17,5 +17,22 @@ describe("classifyErrorType", () => {
 
   it("falls back to general", () => {
     expect(classifyErrorType("What is the correct answer?")).toBe("general");
+  });
+
+  it("classifies reading and listening comprehension mistakes", () => {
+    expect(classifyErrorType("Choose the best summary of this passage")).toBe("reading_comprehension");
+    expect(classifyErrorType("会話の内容として正しいものはどれですか")).toBe("listening_comprehension");
+  });
+});
+
+describe("getTargetedRetrySet", () => {
+  it("returns highest-frequency mistake types first", () => {
+    const retry = getTargetedRetrySet([
+      { error_type: "particles", module: "grammar" },
+      { error_type: "particles", module: "grammar" },
+      { error_type: "kanji_confusion", module: "kanji" },
+    ]);
+
+    expect(retry[0]).toMatchObject({ errorType: "particles", module: "grammar", count: 2 });
   });
 });

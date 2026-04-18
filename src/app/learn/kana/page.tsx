@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { hiragana, katakana } from "@/lib/app-data";
+import { supabase } from "@/lib/client";
 
 const toRoma: Record<string, string> = { あ: "a", い: "i", う: "u", え: "e", お: "o", ア: "a", イ: "i", ウ: "u", エ: "e", オ: "o" };
 
@@ -11,6 +12,7 @@ export default function KanaPage() {
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [score, setScore] = useState(0);
+  const [saved, setSaved] = useState(false);
 
   const chars = mode === "hiragana" ? hiragana : katakana;
   const current = chars[index % chars.length];
@@ -38,6 +40,20 @@ export default function KanaPage() {
         </button>
         <p>Score: {score}</p>
         <p className={thresholdReached ? "text-green-600" : "text-amber-600"}>{thresholdReached ? "Unlocked core modules" : "Keep training to unlock"}</p>
+        {thresholdReached ? (
+          <button
+            className="rounded-lg border px-3 py-2"
+            onClick={async () => {
+              const user = (await supabase.auth.getUser()).data.user;
+              if (!user) return;
+              await supabase.from("profiles").upsert({ id: user.id, kana_mastered: true, display_name: "Learner" });
+              setSaved(true);
+            }}
+          >
+            Mark Kana Gate as Completed
+          </button>
+        ) : null}
+        {saved ? <p className="text-sm text-green-600">Kana gate saved. JLPT tracks unlocked.</p> : null}
       </section>
     </AppShell>
   );

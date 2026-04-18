@@ -15,10 +15,11 @@ export const ensureSignedIn = async () => {
 export const saveOnboarding = async (payload: unknown) => {
   const parsed = onboardingSchema.parse(payload);
   const user = await ensureSignedIn();
+  const kanaMastered = parsed.placementScore >= 40;
 
   const { error: profileError } = await supabase
     .from("profiles")
-    .upsert({ id: user.id, display_name: "Learner" });
+    .upsert({ id: user.id, display_name: "Learner", kana_mastered: kanaMastered });
 
   if (profileError) throw profileError;
 

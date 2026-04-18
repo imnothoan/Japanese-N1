@@ -19,6 +19,8 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const supabase = createServiceSupabase();
+  const { data: profile } = await supabase.from("profiles").select("kana_mastered").eq("id", user.id).maybeSingle();
+  if (!profile?.kana_mastered) return NextResponse.json({ error: "Kana gate required" }, { status: 403 });
   const { data: reviewItem, error: itemError } = await supabase
     .from("review_items")
     .select("*")
@@ -32,6 +34,8 @@ export async function POST(request: NextRequest) {
     easinessFactor: Number(reviewItem.easiness_factor),
     interval: reviewItem.interval_days,
     repetitions: reviewItem.repetitions,
+    lapses: reviewItem.lapse_count ?? 0,
+    dueDate: reviewItem.due_date ? new Date(reviewItem.due_date) : undefined,
   };
 
   const next = calculateNextReview(previousState, parsed.data.grade);
@@ -40,6 +44,7 @@ export async function POST(request: NextRequest) {
     easiness_factor: next.easinessFactor,
     interval_days: next.interval,
     repetitions: next.repetitions,
+    lapse_count: next.lapses ?? 0,
     due_date: next.dueDate.toISOString(),
     leech: next.isLeech,
     state: next.repetitions > 4 ? "mastered" : "learning",

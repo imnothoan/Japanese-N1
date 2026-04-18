@@ -1,0 +1,23 @@
+[
+  {
+    "title": "職場の連絡",
+    "transcript": "明日の会議は九時開始です。資料は今夜までに共有してください。",
+    "audio_url": "",
+    "jlpt_level": "N3",
+    "questions": [{ "question": "資料共有の期限は？", "options": ["今夜まで", "明日まで", "来週まで"], "answer": "今夜まで" }]
+  },
+  {
+    "title": "研究発表準備",
+    "transcript": "結論だけでなく、調査方法も説明してください。図表を追加します。",
+    "audio_url": "",
+    "jlpt_level": "N2",
+    "questions": [{ "question": "何を追加しますか？", "options": ["図表", "写真", "音声"], "answer": "図表" }]
+  },
+  {
+    "title": "公共政策インタビュー",
+    "transcript": "政策の有効性は短期指標だけで測れません。",
+    "audio_url": "",
+    "jlpt_level": "N1",
+    "questions": [{ "question": "主張として正しいものは？", "options": ["短期指標だけで十分", "短期指標だけでは不十分", "指標は不要"], "answer": "短期指標だけでは不十分" }]
+  }
+]

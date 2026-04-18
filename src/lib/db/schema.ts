@@ -9,6 +9,7 @@ export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(),
   displayName: varchar("display_name", { length: 120 }),
   avatarUrl: text("avatar_url"),
+  kanaMastered: boolean("kana_mastered").default(false).notNull(),
   ...timestamps,
 });
 
@@ -31,6 +32,7 @@ export const reviewItems = pgTable("review_items", {
   easinessFactor: numeric("easiness_factor", { precision: 4, scale: 2 }).default("2.50").notNull(),
   intervalDays: integer("interval_days").default(1).notNull(),
   repetitions: integer("repetitions").default(0).notNull(),
+  lapseCount: integer("lapse_count").default(0).notNull(),
   dueDate: timestamp("due_date", { withTimezone: true }).defaultNow().notNull(),
   leech: boolean("leech").default(false).notNull(),
   notes: text("notes"),
@@ -102,5 +104,37 @@ export const auditEvents = pgTable("audit_events", {
   entityType: varchar("entity_type", { length: 40 }).notNull(),
   entityId: uuid("entity_id"),
   payload: jsonb("payload").notNull().default({}),
+  ...timestamps,
+});
+
+export const contentSources = pgTable("content_sources", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  sourceName: text("source_name").notNull(),
+  sourceUrl: text("source_url").notNull(),
+  license: text("license").notNull(),
+  retrievedAt: timestamp("retrieved_at", { withTimezone: true }).defaultNow().notNull(),
+  contentType: varchar("content_type", { length: 30 }).notNull(),
+  notes: text("notes"),
+  ...timestamps,
+});
+
+export const contentImportReports = pgTable("content_import_reports", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  sourceId: uuid("source_id"),
+  contentType: varchar("content_type", { length: 30 }).notNull(),
+  totalRecords: integer("total_records").default(0).notNull(),
+  acceptedRecords: integer("accepted_records").default(0).notNull(),
+  missingRequired: integer("missing_required").default(0).notNull(),
+  duplicateCollisions: integer("duplicate_collisions").default(0).notNull(),
+  byLevel: jsonb("by_level").default({}).notNull(),
+  reportPayload: jsonb("report_payload").default({}).notNull(),
+  ...timestamps,
+});
+
+export const kanaItems = pgTable("kana_items", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  script: varchar("script", { length: 20 }).notNull(),
+  kana: text("kana").notNull(),
+  romaji: varchar("romaji", { length: 20 }).notNull(),
   ...timestamps,
 });

@@ -28,6 +28,8 @@ pnpm dev
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `DATABASE_URL`
+- `UPSTASH_REDIS_REST_URL` (optional, production rate limit backend)
+- `UPSTASH_REDIS_REST_TOKEN` (optional, production rate limit backend)
 
 ## Database
 
@@ -38,6 +40,7 @@ pnpm db:seed
 ```
 
 - migration: `supabase/migrations/0001_initial.sql`
+- hardening migration: `supabase/migrations/0002_hardening_release.sql`
 - starter data: `supabase/seed.sql`
 
 ## Scripts
@@ -57,6 +60,8 @@ pnpm db:seed
 - `src/components/*`: shell and module UI
 - `supabase/*`: migration + seed
 - `scripts/import-content.mjs`: N3/N2/N1 import prep
+- `data/sources/content-sources.json`: open-license source manifest
+- `data/reports/*.json`: normalization validation reports
 
 ## Troubleshooting
 
