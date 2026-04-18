@@ -38,7 +38,7 @@ const rankFocusSkills = (skillScores: Record<DiagnosticSkill, number>) =>
     const ordered = (Object.keys(skillScores) as DiagnosticSkill[]).sort((a, b) => skillScores[a] - skillScores[b]);
     const weakSkills = ordered.filter((skill) => skillScores[skill] < 80);
     if (weakSkills.length > 0) return weakSkills.slice(0, 3);
-    return ["listening", "reading"];
+    return ["listening", "reading"] as DiagnosticSkill[];
   })();
 
 const placementBandFromScore = (score: number): PlacementBand => {
