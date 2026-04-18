@@ -63,6 +63,12 @@ pnpm db:seed
 - `data/sources/content-sources.json`: open-license source manifest
 - `data/reports/*.json`: normalization validation reports
 
+## Recent capabilities
+
+- Multi-tier adaptive onboarding placement with CEFR/JLPT mapping feedback
+- Analytics skill progress cards per module with JLPT ↔ CEFR level breakdown
+- Import pipeline quality gate for open-license validation and quality scoring
+
 ## Troubleshooting
 
 - 401 in API routes: ensure user is signed in anonymously or with magic link.

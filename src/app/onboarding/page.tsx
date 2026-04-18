@@ -52,14 +52,17 @@ export default function OnboardingPage() {
       </div>
 
       <div className="card p-4 space-y-2">
-        <h2 className="text-xl font-semibold">Diagnostic Placement (adaptive short)</h2>
+        <h2 className="text-xl font-semibold">Diagnostic Placement (multi-tier adaptive)</h2>
         {onboardingQuestions.map((question, index) => (
           <label key={question.id} className="grid gap-1 text-sm" htmlFor={question.id}>
-            {question.prompt}
+            <span>{question.prompt}</span>
+            <span className="text-xs opacity-70">Tier: {question.tier}</span>
             <input id={question.id} className="rounded-lg border p-2" value={answers[index]} onChange={(e) => setAnswers((prev) => prev.map((x, i) => (i === index ? e.target.value : x)))} />
           </label>
         ))}
         <p className="text-sm">Estimated placement: {assessment.placementBand} ({assessment.placementScore}%)</p>
+        <p className="text-sm">Estimated CEFR/JLPT: {assessment.cefrLevel} / {assessment.suggestedJlptLevel}</p>
+        <p className="text-sm">Assessed tiers: {assessment.assessedTiers.join(" → ")}</p>
         <p className="text-sm">Focus next: {assessment.focusSkills.join(", ")}</p>
         <p className="text-xs opacity-80">{assessment.recommendation}</p>
         <button className="rounded-xl bg-blue-600 px-4 py-2 text-white" onClick={onSubmit}>Save onboarding</button>

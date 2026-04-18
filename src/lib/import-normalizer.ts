@@ -5,6 +5,9 @@ type NormalizationReport = {
   accepted: number;
   missingRequired: number;
   duplicates: number;
+  licenseApproved: boolean;
+  qualityScore: number;
+  qualityGatePassed: boolean;
   byLevel: Partial<Record<"N5" | "N4" | "N3" | "N2" | "N1", number>>;
 };
 
@@ -82,14 +85,48 @@ const normalizers: Record<ContentType, (input: Record<string, unknown>) => Norma
   listening: normalizeListening,
 };
 
-export const normalizeContentBatch = (contentType: ContentType, items: unknown[]) => {
+const approvedLicenseTokens = [
+  "CC0",
+  "CC BY",
+  "CC-BY",
+  "CC BY-SA",
+  "CC-BY-SA",
+  "EDRDG",
+  "MIT",
+];
+
+const isOpenLicenseApproved = (license?: string) => {
+  if (!license) return true;
+  const normalized = license.trim().toUpperCase();
+  return approvedLicenseTokens.some((token) => normalized.includes(token));
+};
+
+const toQualityScore = (report: Pick<NormalizationReport, "total" | "missingRequired" | "duplicates" | "licenseApproved" | "byLevel">) => {
+  if (report.total === 0) return 0;
+  const missingPenalty = Math.round((report.missingRequired / report.total) * 50);
+  const duplicatePenalty = Math.round((report.duplicates / report.total) * 20);
+  const levelCount = Object.keys(report.byLevel).length;
+  const levelPenalty = levelCount === 0 ? 10 : 0;
+  const licensePenalty = report.licenseApproved ? 0 : 60;
+  return Math.max(0, 100 - missingPenalty - duplicatePenalty - levelPenalty - licensePenalty);
+};
+
+type NormalizeOptions = {
+  sourceLicense?: string;
+};
+
+export const normalizeContentBatch = (contentType: ContentType, items: unknown[], options: NormalizeOptions = {}) => {
   const dedupe = new Set<string>();
   const rows: NormalizedRecord[] = [];
+  const licenseApproved = isOpenLicenseApproved(options.sourceLicense);
   const report: NormalizationReport = {
     total: items.length,
     accepted: 0,
     missingRequired: 0,
     duplicates: 0,
+    licenseApproved,
+    qualityScore: 0,
+    qualityGatePassed: false,
     byLevel: {},
   };
 
@@ -120,6 +157,9 @@ export const normalizeContentBatch = (contentType: ContentType, items: unknown[]
     }
   }
 
-  report.accepted = rows.length;
-  return { rows, report };
+  report.accepted = licenseApproved ? rows.length : 0;
+  report.qualityScore = toQualityScore(report);
+  const acceptanceRatio = report.total > 0 ? report.accepted / report.total : 0;
+  report.qualityGatePassed = report.licenseApproved && acceptanceRatio >= 0.6 && report.qualityScore >= 70;
+  return { rows: licenseApproved ? rows : [], report };
 };

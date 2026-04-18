@@ -72,3 +72,19 @@ const mockActionSchema = z.discriminatedUnion("action", [
 ]);
 
 export const mockTestActionSchema = mockActionSchema;
+
+const approvedImportLicenses = [
+  "CC0",
+  "CC BY 4.0",
+  "CC BY-SA 4.0",
+  "CC BY 2.0 FR",
+  "EDRDG Licence",
+  "MIT",
+] as const;
+
+export const contentImportSchema = z.object({
+  contentType: z.enum(["kana", "vocabulary", "kanji", "grammar", "reading", "listening"]),
+  sourceName: z.string().min(1).max(200),
+  sourceLicense: z.enum(approvedImportLicenses),
+  items: z.array(z.record(z.string(), z.unknown())).min(1),
+});

@@ -17,5 +17,11 @@ Provenance tables:
 Import preparation:
 
 ```bash
-node scripts/import-content.mjs ./my-n3-vocab.json vocabulary "JMDict"
+node scripts/import-content.mjs ./my-n3-vocab.json vocabulary "JMDict" "EDRDG Licence"
 ```
+
+Quality gate checks are now automatic during import preparation:
+- open-license whitelist validation
+- missing-field / duplicate penalties
+- quality score calculation (`0-100`)
+- `qualityGatePassed` flag in the generated report

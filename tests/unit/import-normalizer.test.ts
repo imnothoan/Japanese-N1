@@ -29,4 +29,25 @@ describe("normalizeContentBatch", () => {
     expect(reading.report.byLevel.N4).toBe(1);
     expect(reading.report.byLevel.N2).toBe(1);
   });
+
+  it("blocks imports when license is not in approved open-license list", () => {
+    const result = normalizeContentBatch("vocabulary", [
+      { term: "学生", reading: "がくせい", meaning: "student", jlpt_level: "N5" },
+    ], { sourceLicense: "All rights reserved" });
+
+    expect(result.rows).toHaveLength(0);
+    expect(result.report.licenseApproved).toBe(false);
+    expect(result.report.qualityGatePassed).toBe(false);
+  });
+
+  it("passes quality gate when license approved and acceptance ratio is healthy", () => {
+    const result = normalizeContentBatch("vocabulary", [
+      { term: "学生", reading: "がくせい", meaning: "student", jlpt_level: "N5" },
+      { term: "約束", reading: "やくそく", meaning: "promise", jlpt_level: "N3" },
+    ], { sourceLicense: "CC BY 4.0" });
+
+    expect(result.report.licenseApproved).toBe(true);
+    expect(result.report.qualityGatePassed).toBe(true);
+    expect(result.report.qualityScore).toBeGreaterThanOrEqual(80);
+  });
 });
