@@ -27,7 +27,7 @@ export type SkillProgressCard = {
 const skills: SkillName[] = ["vocabulary", "kanji", "grammar", "reading", "listening"];
 const levelWeight: Record<JlptLevel, number> = { N5: 1, N4: 2, N3: 3, N2: 4, N1: 5 };
 
-const toPercent = (numerator: number, denominator: number) => (denominator > 0 ? Math.round((numerator / denominator) * 100) : 0);
+const calculatePercentage = (numerator: number, denominator: number) => (denominator > 0 ? Math.round((numerator / denominator) * 100) : 0);
 
 const asSkill = (value: string): SkillName | null => {
   if (skills.includes(value as SkillName)) return value as SkillName;
@@ -72,7 +72,7 @@ export const summarizeSkillProgress = (attempts: SkillAttempt[]): SkillProgressC
           jlptLevel: level,
           cefrLevel: mapJlptToCefr(level),
           attempts: levelRows.length,
-          accuracy: toPercent(levelCorrect, levelTotal),
+          accuracy: calculatePercentage(levelCorrect, levelTotal),
         };
       })
       .filter((value): value is SkillLevelSummary => Boolean(value));
@@ -80,7 +80,7 @@ export const summarizeSkillProgress = (attempts: SkillAttempt[]): SkillProgressC
     return {
       skill,
       attempts: rows.length,
-      accuracy: toPercent(correct, total),
+      accuracy: calculatePercentage(correct, total),
       cefrBand: pickCefrBand(levels),
       levels,
     };

@@ -44,7 +44,7 @@ export const onboardingQuestions: OnboardingQuestion[] = [
   { id: "reading-4", prompt: "「施策の実効性が問われる。」What is being questioned?", answer: "effectiveness of measures", skill: "reading", tier: "stretch" },
 ];
 
-const normalize = (value: string) => value.trim().toLowerCase().replaceAll(/\s+/g, " ");
+const normalizeAnswerText = (value: string) => value.trim().toLowerCase().replaceAll(/\s+/g, " ");
 
 const toPercent = (value: number, total: number) => (total === 0 ? 0 : Math.round((value / total) * 100));
 
@@ -80,8 +80,8 @@ const allowedTiers = (answers: string[]) => {
     let correct = 0;
     tierQuestions.forEach((question) => {
       const index = onboardingQuestions.findIndex((q) => q.id === question.id);
-      const userAnswer = normalize(answers[index] ?? "");
-      if (userAnswer && userAnswer === normalize(question.answer)) correct += 1;
+      const userAnswer = normalizeAnswerText(answers[index] ?? "");
+      if (userAnswer && userAnswer === normalizeAnswerText(question.answer)) correct += 1;
     });
     return toPercent(correct, tierQuestions.length);
   };
@@ -117,8 +117,8 @@ export const assessOnboarding = (answers: string[]): OnboardingAssessment => {
   onboardingQuestions.forEach((question, index) => {
     if (!assessedTiers.includes(question.tier)) return;
     skillTotals[question.skill] += 1;
-    const userAnswer = normalize(answers[index] ?? "");
-    if (userAnswer && userAnswer === normalize(question.answer)) {
+    const userAnswer = normalizeAnswerText(answers[index] ?? "");
+    if (userAnswer && userAnswer === normalizeAnswerText(question.answer)) {
       skillCorrect[question.skill] += 1;
     }
   });

@@ -130,6 +130,12 @@ export const normalizeContentBatch = (contentType: ContentType, items: unknown[]
     byLevel: {},
   };
 
+  if (!licenseApproved) {
+    report.qualityScore = toQualityScore(report);
+    report.qualityGatePassed = false;
+    return { rows: [], report };
+  }
+
   for (const rawItem of items) {
     if (!rawItem || typeof rawItem !== "object") {
       report.missingRequired += 1;
@@ -157,9 +163,9 @@ export const normalizeContentBatch = (contentType: ContentType, items: unknown[]
     }
   }
 
-  report.accepted = licenseApproved ? rows.length : 0;
+  report.accepted = rows.length;
   report.qualityScore = toQualityScore(report);
   const acceptanceRatio = report.total > 0 ? report.accepted / report.total : 0;
   report.qualityGatePassed = report.licenseApproved && acceptanceRatio >= 0.6 && report.qualityScore >= 70;
-  return { rows: licenseApproved ? rows : [], report };
+  return { rows, report };
 };

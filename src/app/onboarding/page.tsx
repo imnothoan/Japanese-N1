@@ -7,6 +7,7 @@ import { saveOnboarding } from "@/lib/user";
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const minExamDate = new Date().toISOString().slice(0, 10);
   const [targetLevel, setTargetLevel] = useState<"N3" | "N2" | "N1">("N2");
   const [targetExamDate, setTargetExamDate] = useState("");
   const [dailyMinutes, setDailyMinutes] = useState(60);
@@ -38,7 +39,7 @@ export default function OnboardingPage() {
             </select>
           </label>
           <label className="grid gap-1" htmlFor="exam-date">Exam date
-            <input id="exam-date" type="date" className="rounded-lg border p-2" value={targetExamDate} onChange={(e) => setTargetExamDate(e.target.value)} />
+            <input id="exam-date" type="date" min={minExamDate} className="rounded-lg border p-2" value={targetExamDate} onChange={(e) => setTargetExamDate(e.target.value)} />
           </label>
           <label className="grid gap-1" htmlFor="daily-minutes">Daily minutes
             <input id="daily-minutes" type="number" className="rounded-lg border p-2" value={dailyMinutes} onChange={(e) => setDailyMinutes(Number(e.target.value))} />
