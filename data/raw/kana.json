@@ -1,0 +1,6 @@
+[
+  { "script": "hiragana", "kana": "あ", "romaji": "a" },
+  { "script": "hiragana", "kana": "い", "romaji": "i" },
+  { "script": "katakana", "kana": "ア", "romaji": "a" },
+  { "script": "katakana", "kana": "イ", "romaji": "i" }
+]
