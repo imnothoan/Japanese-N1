@@ -5,13 +5,15 @@ import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import { AppShell } from "@/components/app-shell";
 import { supabase } from "@/lib/client";
 
+const MAX_ANALYTICS_DAYS = 30;
+
 export default function AnalyticsPage() {
   const data = useQuery({
     queryKey: ["analytics"],
     queryFn: async () => {
       const user = (await supabase.auth.getUser()).data.user;
       if (!user) return [];
-      const { data, error } = await supabase.from("learning_metrics").select("metric_date,retention_rate,study_minutes").eq("user_id", user.id).order("metric_date", { ascending: true }).limit(30);
+      const { data, error } = await supabase.from("learning_metrics").select("metric_date,retention_rate,study_minutes").eq("user_id", user.id).order("metric_date", { ascending: true }).limit(MAX_ANALYTICS_DAYS);
       if (error) throw error;
       return data ?? [];
     },

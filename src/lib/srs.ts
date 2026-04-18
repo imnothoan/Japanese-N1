@@ -13,6 +13,9 @@ const gradeToQuality: Record<ReviewGrade, number> = {
   easy: 5,
 };
 
+// Mark as leech after this many accumulated failed repetitions.
+const LEECH_THRESHOLD = 3;
+
 export const calculateNextReview = (state: Sm2State, grade: ReviewGrade) => {
   const q = gradeToQuality[grade];
 
@@ -22,7 +25,7 @@ export const calculateNextReview = (state: Sm2State, grade: ReviewGrade) => {
       interval: 1,
       repetitions: 0,
       dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      isLeech: state.repetitions >= 3,
+      isLeech: state.repetitions >= LEECH_THRESHOLD,
     };
   }
 

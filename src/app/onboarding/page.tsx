@@ -10,6 +10,9 @@ const questions = [
   { id: 3, prompt: "Choose particle for destination: 学校__行く", answer: "へ" },
 ];
 
+// Minimum diagnostic score required to skip forced Kana foundation.
+const KANA_PATH_THRESHOLD = 40;
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [targetLevel, setTargetLevel] = useState<"N3" | "N2" | "N1">("N2");
@@ -29,7 +32,7 @@ export default function OnboardingPage() {
     try {
       await saveOnboarding({ targetLevel, targetExamDate, dailyMinutes, preferredSchedule, placementScore });
       setStatus("Saved. Redirecting...");
-      router.push(placementScore < 40 ? "/learn/kana" : "/dashboard");
+      router.push(placementScore < KANA_PATH_THRESHOLD ? "/learn/kana" : "/dashboard");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed");
     }

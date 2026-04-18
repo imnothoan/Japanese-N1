@@ -1,3 +1,5 @@
+// NOTE: This in-memory limiter is suitable for a single runtime process.
+// TODO: Replace with Redis-backed shared limiter for multi-instance production deployments.
 const buckets = new Map<string, { count: number; resetAt: number }>();
 
 export const checkRateLimit = (key: string, limit: number, windowMs: number) => {

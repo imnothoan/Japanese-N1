@@ -3,6 +3,7 @@ import { z } from "zod";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { createServiceSupabase } from "@/lib/supabase";
 import { getRequestUser } from "@/lib/server-auth";
+import { classifyErrorType } from "@/lib/error-classifier";
 
 const schema = z.object({
   userId: z.string().uuid(),
@@ -13,13 +14,6 @@ const schema = z.object({
   total: z.number().int().positive(),
   responses: z.array(z.object({ question: z.string(), chosen: z.string(), correct: z.string() })),
 });
-
-const classifyErrorType = (question: string) => {
-  if (question.includes("particle") || question.includes("助詞")) return "particles";
-  if (question.includes("文法")) return "similar_grammar";
-  if (question.match(/[一-龯]/)) return "kanji_confusion";
-  return "general";
-};
 
 export async function POST(request: NextRequest) {
   const user = await getRequestUser(request);

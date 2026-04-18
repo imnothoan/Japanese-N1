@@ -18,6 +18,13 @@ const source = {
 
 const parsed = envSchema.safeParse(source);
 
+if (!parsed.success && process.env.NODE_ENV !== "test") {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Invalid production environment configuration for Supabase.");
+  }
+  console.warn("Environment validation failed; using fallback development values.", parsed.error.flatten());
+}
+
 export const env = parsed.success ? parsed.data : { ...source, NEXT_PUBLIC_APP_URL: source.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000" };
 
 export const assertRequiredEnv = () => {

@@ -14,6 +14,18 @@ describe("calculateNextReview", () => {
     expect(next.repetitions).toBe(3);
   });
 
+  it("uses conservative growth on hard", () => {
+    const next = calculateNextReview({ easinessFactor: 2.5, interval: 10, repetitions: 3 }, "hard");
+    expect(next.interval).toBeLessThan(25);
+    expect(next.interval).toBeGreaterThanOrEqual(1);
+  });
+
+  it("uses accelerated growth on easy", () => {
+    const next = calculateNextReview({ easinessFactor: 2.5, interval: 10, repetitions: 3 }, "easy");
+    expect(next.interval).toBeGreaterThan(20);
+    expect(next.easinessFactor).toBeGreaterThan(2.5);
+  });
+
   it("marks leech on repeated failures", () => {
     const next = calculateNextReview({ easinessFactor: 2.0, interval: 3, repetitions: 3 }, "again");
     expect(next.isLeech).toBe(true);
