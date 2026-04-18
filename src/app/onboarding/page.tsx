@@ -32,19 +32,19 @@ export default function OnboardingPage() {
       <div className="card p-4 space-y-3">
         <h1 className="text-2xl font-semibold">Onboarding & Diagnostic</h1>
         <div className="grid gap-2 md:grid-cols-2">
-          <label className="grid gap-1">Target JLPT
-            <select className="rounded-lg border p-2" value={targetLevel} onChange={(e) => setTargetLevel(e.target.value as "N3" | "N2" | "N1")}>
+          <label className="grid gap-1" htmlFor="target-level">Target JLPT
+            <select id="target-level" className="rounded-lg border p-2" value={targetLevel} onChange={(e) => setTargetLevel(e.target.value as "N3" | "N2" | "N1")}>
               <option>N3</option><option>N2</option><option>N1</option>
             </select>
           </label>
-          <label className="grid gap-1">Exam date
-            <input type="date" className="rounded-lg border p-2" value={targetExamDate} onChange={(e) => setTargetExamDate(e.target.value)} />
+          <label className="grid gap-1" htmlFor="exam-date">Exam date
+            <input id="exam-date" type="date" className="rounded-lg border p-2" value={targetExamDate} onChange={(e) => setTargetExamDate(e.target.value)} />
           </label>
-          <label className="grid gap-1">Daily minutes
-            <input type="number" className="rounded-lg border p-2" value={dailyMinutes} onChange={(e) => setDailyMinutes(Number(e.target.value))} />
+          <label className="grid gap-1" htmlFor="daily-minutes">Daily minutes
+            <input id="daily-minutes" type="number" className="rounded-lg border p-2" value={dailyMinutes} onChange={(e) => setDailyMinutes(Number(e.target.value))} />
           </label>
-          <label className="grid gap-1">Preferred schedule
-            <select className="rounded-lg border p-2" value={preferredSchedule} onChange={(e) => setPreferredSchedule(e.target.value as "morning" | "afternoon" | "evening" | "mixed")}>
+          <label className="grid gap-1" htmlFor="preferred-schedule">Preferred schedule
+            <select id="preferred-schedule" className="rounded-lg border p-2" value={preferredSchedule} onChange={(e) => setPreferredSchedule(e.target.value as "morning" | "afternoon" | "evening" | "mixed")}>
               <option value="morning">Morning</option><option value="afternoon">Afternoon</option><option value="evening">Evening</option><option value="mixed">Mixed</option>
             </select>
           </label>
@@ -54,9 +54,9 @@ export default function OnboardingPage() {
       <div className="card p-4 space-y-2">
         <h2 className="text-xl font-semibold">Diagnostic Placement (adaptive short)</h2>
         {onboardingQuestions.map((question, index) => (
-          <label key={question.id} className="grid gap-1 text-sm">
+          <label key={question.id} className="grid gap-1 text-sm" htmlFor={question.id}>
             {question.prompt}
-            <input className="rounded-lg border p-2" value={answers[index]} onChange={(e) => setAnswers((prev) => prev.map((x, i) => (i === index ? e.target.value : x)))} />
+            <input id={question.id} className="rounded-lg border p-2" value={answers[index]} onChange={(e) => setAnswers((prev) => prev.map((x, i) => (i === index ? e.target.value : x)))} />
           </label>
         ))}
         <p className="text-sm">Estimated placement: {assessment.placementBand} ({assessment.placementScore}%)</p>
