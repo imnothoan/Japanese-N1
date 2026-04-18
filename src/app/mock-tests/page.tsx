@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/app-shell";
 import { supabase } from "@/lib/client";
+import { getInitialSectionState, tickSectionTimer, type SectionTimerState } from "@/lib/mock-test-timer";
 
 export default function MockTestsPage() {
   const [status, setStatus] = useState("");
   const [activeAttemptId, setActiveAttemptId] = useState<string>("");
+  const [activeMockTitle, setActiveMockTitle] = useState<string>("");
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerState, setTimerState] = useState<SectionTimerState | null>(null);
   const tests = useQuery({
     queryKey: ["mock-tests"],
     queryFn: async () => {
@@ -56,6 +60,11 @@ export default function MockTestsPage() {
     });
     const payload = await response.json();
     setActiveAttemptId(payload.attemptId ?? "");
+    const selected = (tests.data ?? []).find((test: Record<string, unknown>) => String(test.id) === mockTestId);
+    const sections = Array.isArray(selected?.sections) ? selected.sections : [];
+    setTimerState(getInitialSectionState(sections as Array<{ name: string; duration_seconds?: number }>));
+    setActiveMockTitle(String(selected?.title ?? "Mock Test"));
+    setTimerRunning(true);
     setStatus("Mock test started with persisted timer state.");
   };
 
@@ -73,12 +82,13 @@ export default function MockTestsPage() {
         action: "pause",
         userId: user.id,
         attemptId: activeAttemptId,
-        remainingSeconds: 900,
-        currentSection: "Language Knowledge",
-        sectionState: { currentQuestion: 4 },
+        remainingSeconds: timerState?.remainingSeconds ?? 0,
+        currentSection: timerState?.currentSection ?? "Language Knowledge",
+        sectionState: timerState ?? {},
         responses: {},
       }),
     });
+    setTimerRunning(false);
     setStatus("Paused and persisted.");
   };
 
@@ -94,6 +104,7 @@ export default function MockTestsPage() {
       },
       body: JSON.stringify({ action: "resume", userId: user.id, attemptId: activeAttemptId }),
     });
+    setTimerRunning(true);
     setStatus("Resumed.");
   };
 
@@ -111,10 +122,10 @@ export default function MockTestsPage() {
         action: "submit_section",
         userId: user.id,
         attemptId: activeAttemptId,
-        sectionName: "Language Knowledge",
+        sectionName: timerState?.currentSection ?? "Language Knowledge",
         score: 7,
         total: 10,
-        elapsedSeconds: 600,
+        elapsedSeconds: 600 - (timerState?.remainingSeconds ?? 0),
       }),
     });
     setStatus("Section submitted.");
@@ -142,10 +153,33 @@ export default function MockTestsPage() {
     setStatus("Mock finished. Summary stored for trend tracking.");
   };
 
+  useEffect(() => {
+    if (!timerRunning || !timerState || timerState.completed) return undefined;
+    const id = setInterval(() => {
+      setTimerState((previous) => (previous ? tickSectionTimer(previous, 1) : previous));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [timerRunning, timerState]);
+
+  const timerText = useMemo(() => {
+    if (!timerState) return "Not started";
+    const mins = Math.floor(timerState.remainingSeconds / 60);
+    const secs = timerState.remainingSeconds % 60;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  }, [timerState]);
+
   return (
     <AppShell title="Full Mock Tests">
       <section className="card p-4 space-y-3">
         <p className="text-sm">Timed sections with pause/resume and per-section submissions.</p>
+        {timerState ? (
+          <div className="rounded border p-3 text-sm">
+            <p className="font-semibold">{activeMockTitle || "Active mock test"}</p>
+            <p>Section: {timerState.currentSection}</p>
+            <p>Timer: <span className="font-mono">{timerText}</span></p>
+            <p>Status: {timerState.completed ? "Completed" : timerRunning ? "Running" : "Paused"}</p>
+          </div>
+        ) : null}
         {gate.data === false ? <p className="rounded border border-amber-300 bg-amber-50 p-2 text-sm">Kana gate is required before mock tests. Complete <a className="underline" href="/learn/kana">Kana Foundation</a>.</p> : null}
         {tests.isLoading ? <p className="text-sm">Loading mock tests...</p> : null}
         {tests.isError ? <p className="text-sm text-red-600">Failed to load mock tests.</p> : null}
