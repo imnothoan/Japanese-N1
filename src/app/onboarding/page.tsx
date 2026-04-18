@@ -2,16 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { assessOnboarding, onboardingQuestions } from "@/lib/onboarding-assessment";
 import { saveOnboarding } from "@/lib/user";
-
-const questions = [
-  { id: 1, prompt: "Read this kana: あ", answer: "a" },
-  { id: 2, prompt: "Meaning of 学生", answer: "student" },
-  { id: 3, prompt: "Choose particle for destination: 学校__行く", answer: "へ" },
-];
-
-// Minimum diagnostic score required to skip forced Kana foundation.
-const KANA_PATH_THRESHOLD = 40;
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -19,20 +11,17 @@ export default function OnboardingPage() {
   const [targetExamDate, setTargetExamDate] = useState("");
   const [dailyMinutes, setDailyMinutes] = useState(60);
   const [preferredSchedule, setPreferredSchedule] = useState<"morning" | "afternoon" | "evening" | "mixed">("mixed");
-  const [answers, setAnswers] = useState<string[]>(["", "", ""]);
+  const [answers, setAnswers] = useState<string[]>(() => onboardingQuestions.map(() => ""));
   const [status, setStatus] = useState<string>("");
 
-  const placementScore = useMemo(
-    () => answers.reduce((sum, value, index) => sum + (value.trim().toLowerCase() === questions[index].answer ? 33 : 0), 0),
-    [answers],
-  );
+  const assessment = useMemo(() => assessOnboarding(answers), [answers]);
 
   const onSubmit = async () => {
     setStatus("Saving...");
     try {
-      await saveOnboarding({ targetLevel, targetExamDate, dailyMinutes, preferredSchedule, placementScore });
+      await saveOnboarding({ targetLevel, targetExamDate, dailyMinutes, preferredSchedule, placementScore: assessment.placementScore });
       setStatus("Saved. Redirecting...");
-      router.push(placementScore < KANA_PATH_THRESHOLD ? "/learn/kana" : "/dashboard");
+      router.push(assessment.forceKanaPath ? "/learn/kana" : "/dashboard");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed");
     }
@@ -64,13 +53,15 @@ export default function OnboardingPage() {
 
       <div className="card p-4 space-y-2">
         <h2 className="text-xl font-semibold">Diagnostic Placement (adaptive short)</h2>
-        {questions.map((q, index) => (
-          <label key={q.id} className="grid gap-1 text-sm">
-            {q.prompt}
+        {onboardingQuestions.map((question, index) => (
+          <label key={question.id} className="grid gap-1 text-sm">
+            {question.prompt}
             <input className="rounded-lg border p-2" value={answers[index]} onChange={(e) => setAnswers((prev) => prev.map((x, i) => (i === index ? e.target.value : x)))} />
           </label>
         ))}
-        <p className="text-sm">Estimated placement: {placementScore >= 66 ? "N4+" : placementScore >= 33 ? "Beginner" : "Absolute beginner (Kana path required)"}</p>
+        <p className="text-sm">Estimated placement: {assessment.placementBand} ({assessment.placementScore}%)</p>
+        <p className="text-sm">Focus next: {assessment.focusSkills.join(", ")}</p>
+        <p className="text-xs opacity-80">{assessment.recommendation}</p>
         <button className="rounded-xl bg-blue-600 px-4 py-2 text-white" onClick={onSubmit}>Save onboarding</button>
         {status ? <p className="text-sm">{status}</p> : null}
       </div>
