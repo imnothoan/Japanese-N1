@@ -1,5 +1,20 @@
 # RELEASE NOTES — Hardening + Data Expansion
 
+## Final acceptance pass updates
+
+- Added `SECURITY.md` and `.env.example` to formalize secure setup and secret rotation guidance.
+- Hardened mock test runtime behavior with deterministic timed-section helpers:
+  - `src/lib/mock-test-timer.ts`
+  - unit coverage: `tests/unit/mock-test-timer.test.ts`
+- Improved module usability with note capture + add-to-review queue actions directly from module cards.
+- Expanded E2E smoke coverage with learner-flow state checks in `tests/e2e/smoke.spec.ts`.
+- Added final release/audit artifacts:
+  - `docs/data-attribution-final.md`
+  - `docs/coverage-metrics-final.md`
+  - `docs/security-audit-final.md`
+  - `docs/final-qa-report.md`
+  - `docs/release-readiness-rubric.md`
+
 ## 1) What was completed
 
 - Added provenance + ingestion hardening:

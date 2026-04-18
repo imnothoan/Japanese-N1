@@ -82,10 +82,10 @@ export const ModulePage = ({ title, table }: ModulePageProps) => {
                       reading_passages: "reading",
                       listening_tracks: "listening",
                     };
-                    const module = moduleByTable[table] ?? title.toLowerCase();
+                    const moduleName = moduleByTable[table] ?? title.toLowerCase();
                     const { error } = await supabase.from("review_items").upsert({
                       user_id: user.id,
-                      module,
+                      module: moduleName,
                       source_item_id: sourceItemId,
                       state: "new",
                       notes: notes[sourceItemId] ?? null,
