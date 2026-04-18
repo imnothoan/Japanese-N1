@@ -30,4 +30,35 @@ describe("calculateNextReview", () => {
     const next = calculateNextReview({ easinessFactor: 2.0, interval: 3, repetitions: 3 }, "again");
     expect(next.isLeech).toBe(true);
   });
+
+  it("increments lapse count on failed recall", () => {
+    const next = calculateNextReview(
+      {
+        easinessFactor: 2.3,
+        interval: 8,
+        repetitions: 3,
+        lapses: 1,
+      },
+      "again",
+    );
+    expect(next.lapses).toBe(2);
+  });
+
+  it("dampens growth for heavily overdue cards", () => {
+    const now = new Date("2026-04-18T00:00:00.000Z");
+    const dueDate = new Date("2026-03-18T00:00:00.000Z");
+
+    const overdue = calculateNextReview(
+      { easinessFactor: 2.5, interval: 10, repetitions: 4, dueDate },
+      "good",
+      { now },
+    );
+    const onTime = calculateNextReview(
+      { easinessFactor: 2.5, interval: 10, repetitions: 4, dueDate: now },
+      "good",
+      { now },
+    );
+
+    expect(overdue.interval).toBeLessThan(onTime.interval);
+  });
 });

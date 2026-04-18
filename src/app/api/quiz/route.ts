@@ -19,7 +19,10 @@ export async function POST(request: NextRequest) {
   const user = await getRequestUser(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const limited = checkRateLimit(`quiz:${user.id}`, 30, 60_000);
+  const limited = await checkRateLimit(`quiz:${user.id}`, 30, 60_000, {
+    upstashUrl: process.env.UPSTASH_REDIS_REST_URL,
+    upstashToken: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
   if (!limited.allowed) return NextResponse.json({ error: "Rate limit" }, { status: 429 });
 
   const parsed = schema.safeParse(await request.json());
